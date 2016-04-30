@@ -1,0 +1,36 @@
+#include "../../include/my_head.h"
+
+
+int my_select1(char *ch)
+{
+    //scanf("%s",ch);
+
+    if(my_strcmp(ch,"register") == 0)
+    {
+        return REGISTER;
+    }
+    if(my_strcmp(ch,"log") == 0)
+    {
+        return LOG;
+    }    
+    if(my_strcmp(ch,"forget-psd") == 0)
+    {
+        return CHANGE_PASSWORD;
+    }    
+    if(my_strcmp(ch,"quit") == 0)
+    {
+        return QUIT;
+    }
+
+    if(
+           (my_strcmp(ch,"register") != 0) 
+        && (my_strcmp(ch,"log") != 0)
+	&& (my_strcmp(ch,"quit") != 0)
+&& (my_strcmp(ch,"forget-psd") != 0)
+      )
+    {
+        return WRONG_INPUT;
+    }
+}
+
+

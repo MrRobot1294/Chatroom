@@ -1,0 +1,364 @@
+#include "../../include/my_head.h"
+
+void user_function(int new_fd, Link msg)
+{
+    if(msg->action != FAILED && msg->action != FAILED_BAN)
+    {
+        online_message(msg, new_fd);
+
+	offline_msg(msg, new_fd);
+
+	switch(msg->state)
+	{
+	    case 0:
+            {
+	        while(1)
+		{
+                    memset(msg, 0, sizeof(Node));
+	    
+	            if(read(new_fd, msg, sizeof(Node)) == 0)
+	            {
+		        link_search_sfd(new_fd);
+
+    msg->action = QUIT_USER;
+
+    Link p = online_user->next;
+    while(p != NULL)
+    {
+        if(new_fd != p->online_sfd)
+	{
+            write(p->online_sfd, msg, sizeof(Node));
+        }
+	p = p->next;
+    }
+
+			printf("%d quit\n", new_fd);
+
+		        close(new_fd);
+
+			pthread_exit(0);
+
+	                break;
+	            }
+
+		    switch(msg->action)
+		    {
+		        case PRIVATE_CHAT:
+			{
+			    private_chat(msg, new_fd);
+			    
+			    break;
+			}
+			case GROUP_CHAT:
+			{
+			    group_chat(msg);
+
+			    break;
+			}
+			case CHECK_CHAT_HISTORY:
+			{
+			    check_history(msg, new_fd);
+
+			    break;
+			}
+			case DELETE_CHAT_HISTORY:
+			{
+			    delete_history(msg, new_fd);
+
+			    break;
+			}
+			case FILE_SEND:
+			{
+			    file_send(msg, new_fd);
+
+			    break;
+			}
+			case FILE_SEND_START:
+			{
+			    file_receive(msg, new_fd);
+
+			    break;
+			}
+			case CHANGE_PASSWORD:
+			{
+			    change_password(msg, new_fd);
+
+			    break;
+			}
+			case CHANGE_NAME:
+			{
+			    change_name(msg);
+
+			    break;
+			}
+			case BAN_CHAT:
+			{
+			    ban_chat(msg, new_fd);
+
+			    break;
+			}
+			case QUIT:
+			{
+			    goto EXIT_USER;
+
+			    break;
+			}
+		        default:
+		        {
+		            msg->action = WRONG_INPUT;
+		    
+		            write(new_fd, msg, sizeof(Node));
+		        }
+		    }
+		}
+		break;
+            }
+            case 1:
+	    {
+                CHAT:
+	        while(1)
+		{
+                    memset(msg, 0, sizeof(Node));
+	    
+	            if(read(new_fd, msg, sizeof(Node)) == 0)
+	            { 
+		        link_search_sfd(new_fd);
+
+    msg->action = QUIT_USER;
+
+    Link p = online_user->next;
+    while(p != NULL)
+    {
+        if(new_fd != p->online_sfd)
+	{
+            write(p->online_sfd, msg, sizeof(Node));
+        }
+	p = p->next;
+    }
+
+			printf("%d quit\n", new_fd);
+
+		        close(new_fd);
+
+			pthread_exit(0);
+
+	                break;
+	            }
+
+		    switch(msg->action)
+		    {
+		        case PRIVATE_CHAT:
+			{
+			    private_chat(msg, new_fd);
+
+			    break;
+			}
+			case GROUP_CHAT:
+			{
+			    group_chat(msg);
+
+			    break;
+			}
+			case CHECK_CHAT_HISTORY:
+			{
+			    check_history(msg, new_fd);
+
+			    break;
+			}
+			case DELETE_CHAT_HISTORY:
+			{
+			    delete_history(msg, new_fd);
+
+			    break;
+			}
+			case CHANGE_NAME:
+			{
+			    change_name(msg);
+
+			    break;
+			}
+			case CHANGE_PASSWORD:
+			{
+			    change_password(msg, new_fd);
+
+			    break;
+			}
+			case FILE_SEND:
+			{
+			    file_send(msg, new_fd);
+
+			    break;
+			}
+			case FILE_SEND_START:
+			{
+			    file_receive(msg, new_fd);
+
+			    break;
+			}
+
+			case QUIT:
+			{
+			    goto EXIT_USER;
+
+			    break;
+			}
+	               case SUCCESS_BAN_CHAT:
+	                {
+                        if(msg->online_sfd == 2)
+                            {
+                                goto BANCHAT;
+                            }
+	                    break;
+	                }
+		        default:
+		        {
+		            msg->action = WRONG_INPUT;
+		    
+		            write(new_fd, msg, sizeof(Node));
+
+
+		        }
+		    }
+		}
+		break;
+	    } 
+	    case 2:
+	    {
+                BANCHAT:
+	        while(1)
+		{
+                    memset(msg, 0, sizeof(Node));
+	    
+	            if(read(new_fd, msg, sizeof(Node)) == 0)
+	            { 
+		        link_search_sfd(new_fd);
+
+    msg->action = QUIT_USER;
+
+    Link p = online_user->next;
+    while(p != NULL)
+    {
+        if(new_fd != p->online_sfd)
+	{
+            write(p->online_sfd, msg, sizeof(Node));
+        }
+	p = p->next;
+    }
+
+			printf("%d quit\n", new_fd);
+
+	                break;
+	            }
+
+		    switch(msg->action)
+		    {
+		        case PRIVATE_CHAT:
+			{
+			    msg->action = SUCCESS_BAN;
+
+			    write(new_fd, msg, sizeof(Node));
+
+			    break;
+			}
+			case GROUP_CHAT:
+			{
+			    msg->action = SUCCESS_BAN;
+
+			    write(new_fd, msg, sizeof(Node));
+
+			    break;
+			}
+			case CHECK_CHAT_HISTORY:
+			{
+			    check_history(msg, new_fd);
+
+			    break;
+			}
+			case DELETE_CHAT_HISTORY:
+			{
+			    delete_history(msg, new_fd);
+
+			    break;
+			}
+			case FILE_SEND:
+			{
+			    file_send(msg, new_fd);
+
+			    break;
+			}
+			case FILE_SEND_START:
+			{
+			    file_receive(msg, new_fd);
+
+			    break;
+			}
+			case CHANGE_PASSWORD:
+			{
+			    change_password(msg, new_fd);
+
+			    break;
+			}
+			case CHANGE_NAME:
+			{
+			    change_name(msg);
+
+			    break;
+			}
+	               case SUCCESS_BAN_CHAT:
+	                {
+                        if(msg->online_sfd == 2)
+                            {
+                                goto CHAT;
+                            }
+	                    break;
+	                }
+			case QUIT:
+			{
+			    goto EXIT_USER;
+
+			    break;
+			}
+		        default:
+		        {
+		            msg->action = WRONG_INPUT;
+		    
+		            write(new_fd, msg, sizeof(Node));
+		        }
+		    }
+		}
+		break;
+	    }
+	    default:
+	    {
+		printf("error!\n");
+		    
+		msg->action = FAILED;
+		    
+		write(new_fd, msg, sizeof(Node));
+	    }
+	}
+    }
+
+    EXIT_USER:
+    
+    link_search_sfd(new_fd);
+
+    msg->action = QUIT;
+
+    write(new_fd, msg, sizeof(Node));
+
+    msg->action = QUIT_USER;
+
+    Link p = online_user->next;
+    while(p != NULL)
+    {
+        if(new_fd != p->online_sfd)
+	{
+            write(p->online_sfd, msg, sizeof(Node));
+        }
+	p = p->next;
+    }
+
+    printf("%s quit\n", msg->name);
+
+}

@@ -1,0 +1,233 @@
+#include "../../include/my_head.h"
+
+void handle_server(void * arg)
+{
+    int new_fd = *((int *)arg);
+    
+    int n = 3;
+    int i = 3;
+    char str[50];
+    
+    scrollok(ch_window2, true);
+
+    setlocale(LC_ALL,"");
+
+    Node msg;
+    while(1)
+    {
+        if(msg1.action == QUIT)
+	{
+	    pthread_exit(0);
+	}
+
+        memset(&msg, 0, sizeof(Node));
+
+	if(read(new_fd, &msg, sizeof(Node)) == 0)
+	{
+	    break;
+	}
+
+	switch(msg.action)
+	{
+	    case ONLINE:
+	    {
+	        if(msg.state == 2)
+		{
+		    sprintf(str, "%s(禁言)", msg.name);
+
+		    link_insert(&msg);
+
+		    mvwaddstr(ch_window1, n, 3, str);
+		    wrefresh(ch_window1);
+
+		    n++;
+		}
+		else
+		{
+		    if(msg.state == 0)
+		    {
+		        sprintf(str, "%s(ADMIN)", msg.name);
+	            wprintw(ch_window2, "欢迎 管理员 %s\n", msg.name);
+			mvwaddstr(ch_window1, n, 3, str);
+		    link_insert(&msg);
+			wrefresh(ch_window1);
+			wrefresh(ch_window2);
+
+			n++;
+		    }
+		    else
+		    {
+		        mvwaddstr(ch_window1, n, 3, msg.name);
+			wrefresh(ch_window1);
+		    link_insert(&msg);
+
+			n++;
+		    }
+		}
+		break;
+	    }
+	    case PRIVATE_CHAT:
+	    {
+	        wprintw(ch_window2, "%s 对 你 %s\n", msg.name, msg.message);
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case GROUP_CHAT:
+	    {
+	        wprintw(ch_window2, "%s 对 所有人 %s\n", msg.name, msg.message);
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case SUCCESS_OFFLINE:
+	    {	    
+	        wprintw(ch_window2, "                                    ===================(%s 已离线)\n", msg.target_user);
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case FAILED_NOBODY:
+	    {	    
+	        wprintw(ch_window2, "                                    ===================(%s 不存在)\n", msg.target_user);
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case OFFLINE_MSG:
+	    {
+	        wprintw(ch_window2, "%s 对 你 (离线)%s", msg.name, msg.message);
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case SUCCESS_BAN:
+	    {
+	        wprintw(ch_window2, "对不起，您已被禁言。。。。。\n");
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case SUCCESS_BAN_CHAT:
+	    {
+                if(msg.online_sfd == 2)
+                   {
+	        wprintw(ch_window2, "对不起，您已被禁言。。。。。\n");
+		wrefresh(ch_window2);
+                   }
+                else
+                   {
+	        wprintw(ch_window2, "对不起，您已被解除禁言。。。。。\n");
+		wrefresh(ch_window2);
+                   }
+
+                 write(new_fd, &msg, sizeof(Node));
+
+	        break;
+	    }
+	    case BAN_CHAT:
+	    {
+                if(msg.online_sfd == 2)
+                   {
+	        wprintw(ch_window2, "%s 已被禁言\n", msg.target_user);
+		wrefresh(ch_window2);
+                   }
+                else
+                   {
+	        wprintw(ch_window2, "%s 已被解除禁言\n", msg.target_user);
+		wrefresh(ch_window2);
+                   }
+	        break;
+	    }
+	    case SUCCESS_CHANGE_PSD:
+	    {
+	        wprintw(ch_window2, "密码修改  成功\n");
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case FAILED_CHANGE_PSD:
+	    {
+	        wprintw(ch_window2, "密码修改  失败\n");
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case CHECK_CHAT_HISTORY:
+	    {
+	        wprintw(ch_window2, "%s", msg.message);
+		wrefresh(ch_window2);
+
+	        break;
+	    }
+	    case DELETE_CHAT_HISTORY:
+	    {
+	        if(my_strcmp(msg.message, "success") == 0)
+		{
+		    wprintw(ch_window2, "(删除成功)\n");
+		    wrefresh(ch_window2);
+		}
+		break;
+	    }
+	    case FILE_SEND:
+	    {
+	        wprintw(ch_window2, "%s 发送文件 %s \n", msg.name, msg.answer);
+		wrefresh(ch_window2);
+		//file_receive(new_fd, &msg);
+
+		filesend = FILE_SEND;
+		
+		memset(file_name, 0, sizeof(file_name));
+		my_strcpy(file_name, msg.answer);
+		break;
+
+	    }
+	    case FILE_SEND_START:
+	    {
+	        file_receive_write(&msg); 
+		break;
+	    }
+	    case CHANGE_NAME:
+	    {
+	        if(msg.state == 2)
+		{
+		    sprintf(msg.name, "%s(禁言)", msg.name);
+		}
+		else
+		{
+		    if(msg.state == 0)
+		    {
+		        sprintf(msg.name, "%s(ADMIN)", msg.name);
+		    }
+		}
+
+	        change_name_search_id(&msg);
+
+		while(i < n)
+		{
+		    mvwaddstr(ch_window1, i, 3, "              ");
+		    //wrefresh(ch_window1);
+		    
+		    i++;
+		}
+		    wrefresh(ch_window1);
+
+		n = 3;
+
+		Link p;
+
+		p = online_user->next;
+		while(p != NULL)
+		{
+	            mvwaddstr(ch_window1, n, 3, p->name);
+		    //wrefresh(ch_window1);
+
+		    n++;
+		    p = p->next;
+		}
+		    wrefresh(ch_window1);
+	        break;   
+	    }
+	}
+    }
+}

@@ -1,0 +1,303 @@
+#include "../../include/my_head.h"
+
+void change_password(int new_fd)
+{
+    int i = 0;
+
+    char ch;
+    char psd[20];
+    char str[30] = "                            ";
+    Node msg;
+
+    memset(&msg, 0, sizeof(Node));
+
+    msg.action = CHANGE_PASSWORD;
+
+    clear();
+    refresh();
+    ch_window6 = newwin(17, 70, 5, 24);
+    box(ch_window6, 0, 0);
+
+    mvwaddstr(ch_window6, 1, 1, "ESC");
+    mvwaddstr(ch_window6, 4, 9, "id           :");
+    mvwaddstr(ch_window6, 6, 9, "old-password :");
+    mvwaddstr(ch_window6, 8, 9, "new-password :");
+    mvwaddstr(ch_window6, 10, 9, "re-enter     :");
+
+    mvwaddstr(ch_window6, 4, 52, "(Less than 8)");
+    mvwaddstr(ch_window6, 6, 52, "(Less than 19)");
+    mvwaddstr(ch_window6, 8, 52, "(Less than 19)");
+    mvwaddstr(ch_window6, 10, 52, "(Less than 19)");
+
+    wmove(ch_window6, 4, 20); 
+    wrefresh(ch_window6);
+
+    curs_set(1);
+    noecho();
+    do
+    {
+        i = 0;
+
+        mvwaddstr(ch_window6, 4, 24, str);
+        mvwaddstr(ch_window6, 4, 52, "(8 digit number)");
+        wmove(ch_window6, 4, 24); 
+        wrefresh(ch_window6);
+        while((ch = wgetch(ch_window6)) != '\n')
+        {
+            if(ch == 27)
+	    {
+	        goto EXIT_CHANGE_PASSWORD;
+	    }
+
+	    if(ch == 127)
+	    {
+	        if(i > 0)
+	        {
+	            mvwaddstr(ch_window6, 4, 23 + i, " ");
+	            wmove(ch_window6, 4, 23 + i);
+		    wrefresh(ch_window6);
+
+		    i--;
+		    msg.id[i] = '\0';
+		}
+	    }
+	    else
+	    {
+                msg.id[i] = ch;
+                wprintw(ch_window6, "%c", msg.id[i]);
+	        i++;
+	    }
+
+	    if(i == 9)
+	    {
+	        mvwaddstr(ch_window6, 4, 52, "(More than 8)   ");
+		wmove(ch_window6, 4, 33);
+		wrefresh(ch_window6);
+	    }
+	    if(i == 8)
+	    {
+	        mvwaddstr(ch_window6, 4, 52, "(8 digit number)");
+		wmove(ch_window6, 4, 32);
+		wrefresh(ch_window6);
+	    }
+	    if(i < 8 && i > 0)
+	    {
+	        mvwaddstr(ch_window6, 4, 52, "(Less than 8)   ");
+		wmove(ch_window6, 4, 24 + i);
+		wrefresh(ch_window6);
+	    }
+	    /*while(i > 40)
+	    {
+	        wmove(ch_window6, 5, 51);
+		wrefresh(ch_window6);
+	    }*/
+        }
+    }while(i != 8 || i == 0);
+
+    msg.id[i] = '\0';
+
+    noecho();
+    do
+    {
+        i = 0;
+
+        mvwaddstr(ch_window6, 6, 24, str);
+        mvwaddstr(ch_window6, 6, 52, "(Less than 19)");
+        wmove(ch_window6, 6, 24); 
+        wrefresh(ch_window6);
+        while((ch = wgetch(ch_window6)) != '\n')
+        {
+	    /*if(ch == KEY_DOWN)
+	    {
+	        get(ch_window6, y1, x1);
+                b[i] = '\0';
+                
+		w
+	    }*/
+	    if(ch == 27)
+	    {
+	        goto EXIT_CHANGE_PASSWORD;
+	    }
+
+	    if(ch == 127)
+	    { 
+	        if(i > 0)
+	        {
+	            mvwaddstr(ch_window6, 6, 23 + i, " ");
+	            wmove(ch_window6, 6, 23 + i);
+		    wrefresh(ch_window6);
+
+		    i--;
+		    msg.password[i] = '\0';
+		}
+	    }
+	    else
+	    {
+	        waddch(ch_window6, '*');
+	        wrefresh(ch_window6);
+                msg.password[i] = ch;
+	        i++;
+	    }
+
+	    if(i == 20)
+	    {
+	        mvwaddstr(ch_window6, 6, 52, "(More than 19)");
+		wmove(ch_window6, 6, 44);
+       		wrefresh(ch_window6);
+	    }
+	    if(i == 19)
+	    {
+	        mvwaddstr(ch_window6, 6, 52, "(Less than 19)");
+		wmove(ch_window6, 6, 43);
+       		wrefresh(ch_window6);
+	    }
+	    /*while(i > 40)
+	    {
+	        wmove(ch_window6, 5, 51);
+		wrefresh(ch_window6);
+	    }*/
+        }
+    }while(i > 19 || i == 0);
+
+    msg.password[i] = '\0';
+
+    do
+    {
+        noecho();
+        do
+        {
+            i = 0;
+
+            mvwaddstr(ch_window6, 8, 24, str);
+            mvwaddstr(ch_window6, 10, 24, str);
+            mvwaddstr(ch_window6, 8, 52, "(Less than 19)");
+            mvwaddstr(ch_window6, 10, 52, "(Less than 19)");
+            wmove(ch_window6, 8, 24); 
+            wrefresh(ch_window6);
+            while((ch = wgetch(ch_window6)) != '\n')
+            {
+	        if(ch == 27)
+	        {
+	            goto EXIT_CHANGE_PASSWORD;
+	        }
+
+	        if(ch == 127)
+	        {
+		    if(i > 0)
+	            {
+	                mvwaddstr(ch_window6, 8, 23 + i, " ");
+	                wmove(ch_window6, 8, 23 + i);
+		        wrefresh(ch_window6);
+
+		        i--;
+		        msg.target_user[i] = '\0';
+	            }
+	        }
+	        else
+	        {
+
+	            waddch(ch_window6, '*');
+	            wrefresh(ch_window6);
+                    msg.target_user[i] = ch;
+	            i++;
+		}
+
+	        if(i == 20)
+	        {
+	            mvwaddstr(ch_window6, 8, 52, "(More than 19)");
+		    wmove(ch_window6, 8, 44);
+       		    wrefresh(ch_window6);
+	        }
+	    if(i == 19)
+	    {
+	        mvwaddstr(ch_window6, 8, 52, "(Less than 19)");
+		wmove(ch_window6, 8, 43);
+       		wrefresh(ch_window6);
+	    }
+	        /*while(i > 40)
+	        {
+	            wmove(ch_window6, 5, 51);
+		    wrefresh(ch_window6);
+	        }*/
+            }
+        }while(i > 19 || i == 0);
+
+        msg.target_user[i] = '\0';
+
+        noecho();
+        do
+        {
+            i = 0;
+
+            mvwaddstr(ch_window6, 10, 24, str);
+            mvwaddstr(ch_window6, 10, 52, "(Less than 19)");
+            wmove(ch_window6, 10, 24); 
+            wrefresh(ch_window6);
+            while((ch = wgetch(ch_window6)) != '\n')
+            {
+	        if(ch == 27)
+	        {
+	            goto EXIT_CHANGE_PASSWORD;
+	        }
+
+	        if(ch == 127)
+	        {
+		    if(i > 0)
+	            {
+	                mvwaddstr(ch_window6, 10, 23 + i, " ");
+	                wmove(ch_window6, 10, 23 + i);
+		        wrefresh(ch_window6);
+
+		        i--;
+		        psd[i] = '\0';
+	            }
+	        }
+	        else
+	        {
+	            waddch(ch_window6, '*');
+	            wrefresh(ch_window6);
+                    psd[i] = ch;
+	            i++;
+		}
+
+	        if(i == 20)
+	        {
+	            mvwaddstr(ch_window6, 10, 52, "(More than 19)");
+		    wmove(ch_window6, 10, 44);
+		    wrefresh(ch_window6);
+	        }
+	    if(i == 19)
+	    {
+	        mvwaddstr(ch_window6, 10, 52, "(Less than 19)");
+		wmove(ch_window6, 10, 43);
+       		wrefresh(ch_window6);
+	    }
+	        /*while(i > 40)
+	        {
+	            wmove(ch_window6, 5, 51);
+		    wrefresh(ch_window6);
+	        }*/
+            }
+    
+        }while(i > 19 || i == 0);
+    
+        psd[i] = '\0';
+       
+        if(my_strcmp(psd, msg.target_user) != 0)
+	{
+	    mvwaddstr(ch_window6, 15, 15, "(The NEW-PASSWORD and RE-ENTER are different)");
+	}
+
+    }while(my_strcmp(psd, msg.target_user) != 0);
+
+    mvwaddstr(ch_window6, 15, 15, "                                                 ");
+    wrefresh(ch_window6);
+
+    write(new_fd, &msg, sizeof(Node));
+
+    EXIT_CHANGE_PASSWORD:
+
+
+
+    curs_set(0);
+}
